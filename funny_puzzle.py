@@ -113,7 +113,10 @@ def solve(state, goal_state=[1, 2, 3, 4, 5, 6, 7, 0, 0]):
     WHAT IT SHOULD DO:
         Prints a path of configurations from initial state to goal state along  h values, number of moves, and max queue number in the format specified in the pdf.
     """
-
+    succ_state = get_succ(state)
+    pq = []
+    #heapq.heappush(pq, )
+    
     # This is a format helper.
     # build "state_info_list", for each "state_info" in the list, it contains "current_state", "h" and "move".
     # define and compute max length

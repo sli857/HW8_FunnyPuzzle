@@ -115,18 +115,23 @@ def solve(state, goal_state=[1, 2, 3, 4, 5, 6, 7, 0, 0]):
     """
     succ_state = get_succ(state)
     pq = []
-    #heapq.heappush(pq, )
-    
+    for x in succ_state:
+        priority = get_manhattan_distance(x)
+        heapq.heappush(pq, (priority, x, (0, priority, -1)))
+    for x in pq:
+        print(x)
+
     # This is a format helper.
     # build "state_info_list", for each "state_info" in the list, it contains "current_state", "h" and "move".
     # define and compute max length
     # it can help to avoid any potential format issue.
-    for state_info in state_info_list:
-        current_state = state_info[0]
-        h = state_info[1]
-        move = state_info[2]
-        print(current_state, "h={}".format(h), "moves: {}".format(move))
-    print("Max queue length: {}".format(max_length))
+
+    # for state_info in state_info_list:
+    #     current_state = state_info[0]
+    #     h = state_info[1]
+    #     move = state_info[2]
+    #     print(current_state, "h={}".format(h), "moves: {}".format(move))
+    # print("Max queue length: {}".format(max_length))
 
 if __name__ == "__main__":
     """
@@ -140,5 +145,5 @@ if __name__ == "__main__":
     print()
 
 
-    # solve([2,5,1,4,0,6,7,0,3])
-    # print()
+    solve([2,5,1,4,0,6,7,0,3])
+    print()

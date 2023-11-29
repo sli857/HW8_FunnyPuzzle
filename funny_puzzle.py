@@ -115,23 +115,33 @@ def solve(state, goal_state=[1, 2, 3, 4, 5, 6, 7, 0, 0]):
     """
     pq = []
     state_info_list = []
+    visited = {}
     initial_dis = get_manhattan_distance(state)
+    if(initial_dis == 0):
+        print(goal_state, "h=0 moves: 0")
+        return
+    
     heapq.heappush(pq, (initial_dis, state, (0, initial_dis, -1)))
-    max_queue_length = 1
     while(pq):
         popped = heapq.heappop(pq)
         curr_cost = popped[0]
         curr_state = popped[1]
         curr_info = popped[2]
         
+        visited.add(curr_state)
         curr_move = [curr_state, curr_info[1], curr_info[0]]
         state_info_list.append(curr_move)
 
         succ_list = get_succ(curr_state)
-        print(state_info_list)
+        #print(state_info_list)
         for x in succ_list:
-            if((x != y[0] for y in state_info_list) or (x != z[1] for z in pq)):
-                heapq.heappush(pq, (curr_cost + get_manhattan_distance(x), x, (curr_info[0]+1, get_manhattan_distance(x), state_info_list.index(curr_move))))
+            if(x == goal_state):
+                last_move = [x, 0, curr_cost + 1]
+                state_info_list.append(last_move)
+            if(x in visited):
+                continue
+            if(x == y[1] for y in pq):
+                continue
 
         #print(state_info_list)
 

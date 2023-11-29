@@ -113,13 +113,28 @@ def solve(state, goal_state=[1, 2, 3, 4, 5, 6, 7, 0, 0]):
     WHAT IT SHOULD DO:
         Prints a path of configurations from initial state to goal state along  h values, number of moves, and max queue number in the format specified in the pdf.
     """
-    succ_state = get_succ(state)
     pq = []
-    for x in succ_state:
-        priority = get_manhattan_distance(x)
-        heapq.heappush(pq, (priority, x, (0, priority, -1)))
-    for x in pq:
-        print(x)
+    state_info_list = []
+    initial_dis = get_manhattan_distance(state)
+    heapq.heappush(pq, (initial_dis, state, (0, initial_dis, -1)))
+    max_queue_length = 1
+    while(pq):
+        popped = heapq.heappop(pq)
+        curr_cost = popped[0]
+        curr_state = popped[1]
+        curr_info = popped[2]
+        
+        curr_move = [curr_state, curr_info[1], curr_info[0]]
+        state_info_list.append(curr_move)
+
+        succ_list = get_succ(curr_state)
+        print(state_info_list)
+        for x in succ_list:
+            if((x != y[0] for y in state_info_list) or (x != z[1] for z in pq)):
+                heapq.heappush(pq, (curr_cost + get_manhattan_distance(x), x, (curr_info[0]+1, get_manhattan_distance(x), state_info_list.index(curr_move))))
+
+        #print(state_info_list)
+
 
     # This is a format helper.
     # build "state_info_list", for each "state_info" in the list, it contains "current_state", "h" and "move".
@@ -138,12 +153,12 @@ if __name__ == "__main__":
     Feel free to write your own test code here to exaime the correctness of your functions. 
     Note that this part will not be graded.
     """
-    print_succ([2,5,1,4,0,6,7,0,3])
-    print()
+    # print_succ([2,5,1,4,0,6,7,0,3])
+    # print()
 
-    print(get_manhattan_distance([2,5,1,4,0,6,7,0,3], [1, 2, 3, 4, 5, 6, 7, 0, 0]))
-    print()
+    # print(get_manhattan_distance([2,5,1,4,0,6,7,0,3], [1, 2, 3, 4, 5, 6, 7, 0, 0]))
+    # print()
 
 
-    solve([2,5,1,4,0,6,7,0,3])
+    solve([4, 3, 0, 5, 1, 6, 7, 2, 0])
     print()

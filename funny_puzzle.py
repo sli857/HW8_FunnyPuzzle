@@ -114,34 +114,38 @@ def solve(state, goal_state=[1, 2, 3, 4, 5, 6, 7, 0, 0]):
     WHAT IT SHOULD DO:
         Prints a path of configurations from initial state to goal state along  h values, number of moves, and max queue number in the format specified in the pdf.
     """
+    steps = 0
     pq = []
     state_info_list = []
-    visited = {} #state: (curr_heuristic, curr_cost)
+    visited = {} # steps: state, h, parent, c
     initial_dis = get_manhattan_distance(state)
     if(initial_dis == 0):
         print(goal_state, "h=0 moves: 0\nMax queue length: 0")
         return
-    
     heapq.heappush(pq, (initial_dis, state, (0, initial_dis, -1)))
+
     while(pq):
-        # print(pq)
-        total_cost_est, curr_state, (curr_cost, curr_h, __) = heapq.heappop(pq)
-        # print(total_cost_est, curr_state, (curr_cost, curr_h, __))
-        curr_state_str = str(curr_state)
+        total_cost_est, curr_state, (curr_cost, curr_h, curr_parent) = heapq.heappop(pq)
+        visited[steps] = [curr_state, curr_h, curr_parent, curr_cost]
 
-        visited[curr_state_str] = (curr_h, curr_cost)
-        state_info_list.append([curr_state, curr_h, curr_cost])
-        if(curr_state == goal_state):
+        # reach goal state
+        if(curr_h == 0):
+            while(True):
+                if(steps == -1):
+                    break
+                node = [visited[steps][0], visited[steps][1], visited[steps][3]]
+                state_info_list.insert(0, node)
+                steps = visited[steps][2]
             break
-
+        
         succ_list = get_succ(curr_state)
         for succ_state in succ_list:
-            succ_state_str = str(succ_state)
             succ_h = get_manhattan_distance(succ_state)
-            if(succ_state_str in visited.keys()):
-                continue
-            heapq.heappush(pq, (curr_cost + 1 + succ_h, succ_state, (curr_cost + 1, succ_h, -1)))
-
+            for step, (visited_state, visited_h, p_index, visited_cost) in visited.items():
+                if(succ_state == visited_state):
+                    continue
+            heapq.heappush(pq, (curr_cost + 1 + succ_h, succ_state, (curr_cost + 1, succ_h, steps)))
+        steps += 1
     # This is a format helper.
     # build "state_info_list", for each "state_info" in the list, it contains "current_state", "h" and "move".
     # define and compute max length
@@ -152,8 +156,7 @@ def solve(state, goal_state=[1, 2, 3, 4, 5, 6, 7, 0, 0]):
         h = state_info[1]
         move = state_info[2]
         print(current_state, "h={}".format(h), "moves: {}".format(move))
-    # print("Max queue length: {}".format(max_length))
-    print("Max queue length: 0")
+    print("Max queue length: {}".format(steps))
 
 if __name__ == "__main__":
     """

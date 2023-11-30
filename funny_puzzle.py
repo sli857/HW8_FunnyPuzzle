@@ -6,11 +6,13 @@ import time
 def getXandY(index):
     return index % 3, int(index / 3)
 
+# assume 3*3 grid
 def getIndex(x, y):
     if(x < 0 or x > 2 or y < 0 or y > 2):
         return -1
     return 3 * y + x
 
+# swap two elements
 def swap(lst, i, j):
     lst[i], lst[j] = lst[j], lst[i]
 
@@ -103,6 +105,12 @@ def get_succ(state):
                 succ_states.append(temp_state)
     return sorted(succ_states)
 
+# check whether new node should be added to pq
+def check_visited(succ_state, curr_cost, visited):
+    for x in visited.values():
+        if succ_state == x[0] and curr_cost + 1 >= x[3]:
+            return True
+    return False
 
 def solve(state, goal_state=[1, 2, 3, 4, 5, 6, 7, 0, 0]):
     """
@@ -117,35 +125,42 @@ def solve(state, goal_state=[1, 2, 3, 4, 5, 6, 7, 0, 0]):
     steps = 0
     pq = []
     state_info_list = []
-    visited = {} # steps: state, h, parent, c
+    visited = {} # steps: state, h, parent, cost
+
+    # check if state is goal state right away
     initial_dis = get_manhattan_distance(state)
     if(initial_dis == 0):
         print(goal_state, "h=0 moves: 0\nMax queue length: 0")
         return
+    
+
     heapq.heappush(pq, (initial_dis, state, (0, initial_dis, -1)))
 
+    # iterate when pq is not empty
     while(pq):
         total_cost_est, curr_state, (curr_cost, curr_h, curr_parent) = heapq.heappop(pq)
         visited[steps] = [curr_state, curr_h, curr_parent, curr_cost]
 
         # reach goal state
         if(curr_h == 0):
+            # edit state_info_list by reading vistied dict
             while(True):
                 if(steps == -1):
                     break
-                node = [visited[steps][0], visited[steps][1], visited[steps][3]]
-                state_info_list.insert(0, node)
+                state_info_list.insert(0, [visited[steps][0], visited[steps][1], visited[steps][3]])
                 steps = visited[steps][2]
             break
         
+        # get all successors
         succ_list = get_succ(curr_state)
         for succ_state in succ_list:
             succ_h = get_manhattan_distance(succ_state)
-            for step, (visited_state, visited_h, p_index, visited_cost) in visited.items():
-                if(succ_state == visited_state):
-                    continue
+            if(check_visited(succ_state, curr_cost, visited)):
+                continue
             heapq.heappush(pq, (curr_cost + 1 + succ_h, succ_state, (curr_cost + 1, succ_h, steps)))
+        # increment steps
         steps += 1
+    
     # This is a format helper.
     # build "state_info_list", for each "state_info" in the list, it contains "current_state", "h" and "move".
     # define and compute max length
@@ -170,5 +185,6 @@ if __name__ == "__main__":
     # print()
 
 
-    solve([4, 3, 0, 5, 1, 6, 7, 2, 0])
+    # solve([4, 3, 0, 5, 1, 6, 7, 2, 0])
+    solve([6, 0, 0, 3, 5, 1, 7, 2, 4])
     print()

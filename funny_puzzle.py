@@ -1,5 +1,6 @@
 import heapq
 import copy
+import time
 
 # assume 3*3 grid
 def getXandY(index):
@@ -115,48 +116,44 @@ def solve(state, goal_state=[1, 2, 3, 4, 5, 6, 7, 0, 0]):
     """
     pq = []
     state_info_list = []
-    visited = {}
+    visited = {} #state: (curr_heuristic, curr_cost)
     initial_dis = get_manhattan_distance(state)
     if(initial_dis == 0):
-        print(goal_state, "h=0 moves: 0")
+        print(goal_state, "h=0 moves: 0\nMax queue length: 0")
         return
     
     heapq.heappush(pq, (initial_dis, state, (0, initial_dis, -1)))
     while(pq):
-        popped = heapq.heappop(pq)
-        curr_cost = popped[0]
-        curr_state = popped[1]
-        curr_info = popped[2]
-        
-        visited.add(curr_state)
-        curr_move = [curr_state, curr_info[1], curr_info[0]]
-        state_info_list.append(curr_move)
+        # print(pq)
+        total_cost_est, curr_state, (curr_cost, curr_h, __) = heapq.heappop(pq)
+        # print(total_cost_est, curr_state, (curr_cost, curr_h, __))
+        curr_state_str = str(curr_state)
+
+        visited[curr_state_str] = (curr_h, curr_cost)
+        state_info_list.append([curr_state, curr_h, curr_cost])
+        if(curr_state == goal_state):
+            break
 
         succ_list = get_succ(curr_state)
-        #print(state_info_list)
-        for x in succ_list:
-            if(x == goal_state):
-                last_move = [x, 0, curr_cost + 1]
-                state_info_list.append(last_move)
-            if(x in visited):
+        for succ_state in succ_list:
+            succ_state_str = str(succ_state)
+            succ_h = get_manhattan_distance(succ_state)
+            if(succ_state_str in visited.keys()):
                 continue
-            if(x == y[1] for y in pq):
-                continue
-
-        #print(state_info_list)
-
+            heapq.heappush(pq, (curr_cost + 1 + succ_h, succ_state, (curr_cost + 1, succ_h, -1)))
 
     # This is a format helper.
     # build "state_info_list", for each "state_info" in the list, it contains "current_state", "h" and "move".
     # define and compute max length
     # it can help to avoid any potential format issue.
 
-    # for state_info in state_info_list:
-    #     current_state = state_info[0]
-    #     h = state_info[1]
-    #     move = state_info[2]
-    #     print(current_state, "h={}".format(h), "moves: {}".format(move))
+    for state_info in state_info_list:
+        current_state = state_info[0]
+        h = state_info[1]
+        move = state_info[2]
+        print(current_state, "h={}".format(h), "moves: {}".format(move))
     # print("Max queue length: {}".format(max_length))
+    print("Max queue length: 0")
 
 if __name__ == "__main__":
     """
